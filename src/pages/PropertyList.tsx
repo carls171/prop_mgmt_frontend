@@ -23,9 +23,10 @@ export default function PropertyList() {
       const response = await propertyService.getAll();
       setProperties(response.data);
       setError(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch properties:', err);
-      setError('Could not load properties. Please check if the API is running.');
+      const message = err.response?.data?.message || err.message || 'Could not load properties.';
+      setError(`${message}. Please check if the API is running and CORS is enabled.`);
     } finally {
       setLoading(false);
     }
