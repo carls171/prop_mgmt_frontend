@@ -128,11 +128,9 @@ export default function PropertyDetail() {
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
         </Button>
         <div className="flex gap-2">
-          <Link to={`/properties/${propertyId}/edit`}>
-            <Button variant="outline">
-              <Edit className="mr-2 h-4 w-4" /> Edit
-            </Button>
-          </Link>
+          <Button render={<Link to={`/properties/${propertyId}/edit`} />} variant="outline">
+            <Edit className="mr-2 h-4 w-4" /> Edit
+          </Button>
           <Button variant="destructive" onClick={handleDeleteProperty}>
             <Trash2 className="mr-2 h-4 w-4" /> Delete
           </Button>
@@ -163,10 +161,8 @@ export default function PropertyDetail() {
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold">Income History</h3>
                 <Dialog open={isIncomeDialogOpen} onOpenChange={setIsIncomeDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" className="bg-slate-900 text-white">
-                      <Plus className="mr-2 h-4 w-4" /> Record Payment
-                    </Button>
+                  <DialogTrigger render={<Button size="sm" className="bg-slate-900 text-white" />}>
+                    <Plus className="mr-2 h-4 w-4" /> Record Payment
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
@@ -179,8 +175,11 @@ export default function PropertyDetail() {
                           id="amount"
                           type="number"
                           required
-                          value={newIncome.amount}
-                          onChange={(e) => setNewIncome({ ...newIncome, amount: parseFloat(e.target.value) })}
+                          value={newIncome.amount || ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                            setNewIncome({ ...newIncome, amount: val });
+                          }}
                         />
                       </div>
                       <div className="space-y-2">
@@ -255,10 +254,8 @@ export default function PropertyDetail() {
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold">Expense Logs</h3>
                 <Dialog open={isExpenseDialogOpen} onOpenChange={setIsExpenseDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" className="bg-slate-900 text-white">
-                      <Plus className="mr-2 h-4 w-4" /> Record Expense
-                    </Button>
+                  <DialogTrigger render={<Button size="sm" className="bg-slate-900 text-white" />}>
+                    <Plus className="mr-2 h-4 w-4" /> Record Expense
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
@@ -272,8 +269,11 @@ export default function PropertyDetail() {
                             id="exp-amount"
                             type="number"
                             required
-                            value={newExpense.amount}
-                            onChange={(e) => setNewExpense({ ...newExpense, amount: parseFloat(e.target.value) })}
+                            value={newExpense.amount || ''}
+                            onChange={(e) => {
+                              const val = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                              setNewExpense({ ...newExpense, amount: val });
+                            }}
                           />
                         </div>
                         <div className="space-y-2">

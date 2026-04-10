@@ -53,11 +53,9 @@ export default function PropertyList() {
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Properties</h1>
           <p className="text-slate-500">Manage your rental portfolio and track performance.</p>
         </div>
-        <Link to="/properties/new">
-          <Button className="bg-slate-900 text-white hover:bg-slate-800">
-            <Plus className="mr-2 h-4 w-4" /> Add Property
-          </Button>
-        </Link>
+        <Button render={<Link to="/properties/new" />} className="bg-slate-900 text-white hover:bg-slate-800">
+          <Plus className="mr-2 h-4 w-4" /> Add Property
+        </Button>
       </div>
 
       <div className="relative">

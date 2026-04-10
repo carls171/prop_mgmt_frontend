@@ -123,8 +123,11 @@ export default function PropertyForm() {
                   id="rent"
                   type="number"
                   required
-                  value={formData.monthly_rent}
-                  onChange={(e) => setFormData({ ...formData, monthly_rent: parseFloat(e.target.value) })}
+                  value={formData.monthly_rent || ''}
+                  onChange={(e) => {
+                    const val = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                    setFormData({ ...formData, monthly_rent: val });
+                  }}
                 />
               </div>
             </div>
