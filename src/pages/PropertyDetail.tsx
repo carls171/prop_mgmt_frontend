@@ -45,16 +45,24 @@ export default function PropertyDetail() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [propRes, incRes, expRes, netRes] = await Promise.all([
-        propertyService.getById(propertyId),
-        incomeService.getByPropertyId(propertyId),
-        expenseService.getByPropertyId(propertyId),
-        reportService.getNetIncome(propertyId),
-      ]);
+      
+      // Fetch property first as it's critical
+      const propRes = await propertyService.getById(propertyId);
       setProperty(propRes.data);
-      setIncomes(incRes.data);
-      setExpenses(expRes.data);
-      setNetIncome(netRes.data);
+
+      // Fetch other data in parallel, but don't let them block the whole page if they fail
+      try {
+        const [incRes, expRes, netRes] = await Promise.all([
+          incomeService.getByPropertyId(propertyId).catch(() => ({ data: [] })),
+          expenseService.getByPropertyId(propertyId).catch(() => ({ data: [] })),
+          reportService.getNetIncome(propertyId).catch(() => ({ data: { property_id: propertyId, net_income: 0 } })),
+        ]);
+        setIncomes(incRes.data);
+        setExpenses(expRes.data);
+        setNetIncome(netRes.data);
+      } catch (secondaryErr) {
+        console.warn('Failed to fetch secondary property data:', secondaryErr);
+      }
     } catch (err) {
       console.error('Failed to fetch property details:', err);
       toast.error('Failed to load property details');
@@ -66,26 +74,44 @@ export default function PropertyDetail() {
   const handleAddIncome = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await incomeService.create(propertyId, newIncome);
+      // Try removing property_id from the body since it's in the URL
+      const incomeData = {
+        amount: Number(newIncome.amount),
+        date: newIncome.date,
+        description: newIncome.description || 'Rent Payment'
+      };
+      await incomeService.create(propertyId, incomeData);
       toast.success('Income record added');
       setIsIncomeDialogOpen(false);
       setNewIncome({ amount: 0, date: format(new Date(), 'yyyy-MM-dd'), description: '' });
       fetchData();
-    } catch (err) {
-      toast.error('Failed to add income');
+    } catch (err: any) {
+      console.error('Failed to add income:', err);
+      const message = err.response?.data?.message || err.message || 'Failed to add income';
+      toast.error(message);
     }
   };
 
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await expenseService.create(propertyId, newExpense);
+      // Try removing property_id from the body since it's in the URL
+      const expenseData = {
+        amount: Number(newExpense.amount),
+        date: newExpense.date,
+        category: newExpense.category,
+        vendor: newExpense.vendor || 'General Vendor',
+        description: newExpense.description || 'Property Expense'
+      };
+      await expenseService.create(propertyId, expenseData);
       toast.success('Expense record added');
       setIsExpenseDialogOpen(false);
       setNewExpense({ amount: 0, date: format(new Date(), 'yyyy-MM-dd'), category: '', vendor: '', description: '' });
       fetchData();
-    } catch (err) {
-      toast.error('Failed to add expense');
+    } catch (err: any) {
+      console.error('Failed to add expense:', err);
+      const message = err.response?.data?.message || err.message || 'Failed to add expense';
+      toast.error(message);
     }
   };
 
@@ -130,7 +156,19 @@ export default function PropertyDetail() {
     );
   }
 
-  if (!property) return <div>Property not found</div>;
+  if (!property) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <div className="text-xl font-semibold text-slate-900">Property not found</div>
+        <p className="text-slate-500 text-center max-w-md">
+          We couldn't find the property you're looking for. It may have been deleted or the ID is incorrect.
+        </p>
+        <Button onClick={() => navigate('/')} variant="outline">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

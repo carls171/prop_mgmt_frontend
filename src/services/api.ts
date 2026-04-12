@@ -11,6 +11,35 @@ const api = axios.create({
   },
 });
 
+// Add a request interceptor for debugging
+api.interceptors.request.use((config) => {
+  console.log('API Request:', {
+    url: config.url,
+    method: config.method,
+    data: config.data,
+  });
+  return config;
+});
+
+// Add a response interceptor for better error logging
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      console.error('API Error Response:', {
+        status: error.response.status,
+        data: error.response.data,
+        headers: error.response.headers,
+      });
+    } else if (error.request) {
+      console.error('API Error Request:', error.request);
+    } else {
+      console.error('API Error Message:', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const propertyService = {
   getAll: () => api.get<Property[]>('/properties'),
   getById: (id: number) => api.get<Property>(`/properties/${id}`),
@@ -21,18 +50,18 @@ export const propertyService = {
 
 export const incomeService = {
   getByPropertyId: (propertyId: number) => api.get<Income[]>(`/income/${propertyId}`),
-  create: (propertyId: number, data: Omit<Income, 'income_id' | 'property_id'>) => 
+  create: (propertyId: number, data: any) => 
     api.post<Income>(`/income/${propertyId}`, data),
   delete: (propertyId: number, incomeId: number) => 
     api.delete(`/properties/${propertyId}/income/${incomeId}`),
 };
 
 export const expenseService = {
-  getByPropertyId: (propertyId: number) => api.get<Expense[]>(`/expense/${propertyId}`),
-  create: (propertyId: number, data: Omit<Expense, 'expense_id' | 'property_id'>) => 
-    api.post<Expense>(`/expense/${propertyId}`, data),
+  getByPropertyId: (propertyId: number) => api.get<Expense[]>(`/expenses/${propertyId}`),
+  create: (propertyId: number, data: any) => 
+    api.post<Expense>(`/expenses/${propertyId}`, data),
   delete: (propertyId: number, expenseId: number) => 
-    api.delete(`/properties/${propertyId}/expense/${expenseId}`),
+    api.delete(`/properties/${propertyId}/expenses/${expenseId}`),
 };
 
 export const reportService = {
