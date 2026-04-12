@@ -89,6 +89,17 @@ export default function PropertyDetail() {
     }
   };
 
+  const handleDeleteExpense = async (expenseId: number) => {
+    if (!window.confirm('Are you sure you want to delete this expense record?')) return;
+    try {
+      await expenseService.delete(propertyId, expenseId);
+      toast.success('Expense record deleted');
+      fetchData();
+    } catch (err) {
+      toast.error('Failed to delete expense');
+    }
+  };
+
   const handleDeleteIncome = async (incomeId: number) => {
     if (!window.confirm('Are you sure you want to delete this income record?')) return;
     try {
@@ -328,12 +339,13 @@ export default function PropertyDetail() {
                       <TableHead>Category</TableHead>
                       <TableHead>Vendor</TableHead>
                       <TableHead className="text-right">Amount</TableHead>
+                      <TableHead className="w-[50px]"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {expenses.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={4} className="h-24 text-center text-slate-500">
+                        <TableCell colSpan={5} className="h-24 text-center text-slate-500">
                           No expense records found
                         </TableCell>
                       </TableRow>
@@ -349,6 +361,16 @@ export default function PropertyDetail() {
                           <TableCell>{exp.vendor}</TableCell>
                           <TableCell className="text-right font-semibold text-red-600">
                             ${exp.amount.toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-slate-400 hover:text-red-600"
+                              onClick={() => handleDeleteExpense(exp.expense_id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           </TableCell>
                         </TableRow>
                       ))

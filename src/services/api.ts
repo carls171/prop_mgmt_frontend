@@ -28,9 +28,11 @@ export const incomeService = {
 };
 
 export const expenseService = {
-  getByPropertyId: (propertyId: number) => api.get<Expense[]>(`/expenses/${propertyId}`),
+  getByPropertyId: (propertyId: number) => api.get<Expense[]>(`/expense/${propertyId}`),
   create: (propertyId: number, data: Omit<Expense, 'expense_id' | 'property_id'>) => 
-    api.post<Expense>(`/expenses/${propertyId}`, data),
+    api.post<Expense>(`/expense/${propertyId}`, data),
+  delete: (propertyId: number, expenseId: number) => 
+    api.delete(`/properties/${propertyId}/expense/${expenseId}`),
 };
 
 export const reportService = {
