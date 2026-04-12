@@ -1,9 +1,7 @@
 import axios from 'axios';
 import { Property, Income, Expense, NetIncome } from '../types';
 
-const API_BASE_URL = import.meta.env.DEV 
-  ? '/api-proxy' 
-  : 'https://prop-mgmt-api-1064799326078.us-central1.run.app';
+const API_BASE_URL = '/api-proxy';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
