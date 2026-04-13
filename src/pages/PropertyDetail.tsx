@@ -74,8 +74,11 @@ export default function PropertyDetail() {
   const handleAddIncome = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Try removing property_id from the body since it's in the URL
+      // Generate a random ID as the backend requires income_id and doesn't auto-generate it
+      const randomId = Math.floor(Math.random() * 1000000);
       const incomeData = {
+        income_id: randomId,
+        property_id: propertyId,
         amount: Number(newIncome.amount),
         date: newIncome.date,
         description: newIncome.description || 'Rent Payment'
@@ -87,7 +90,7 @@ export default function PropertyDetail() {
       fetchData();
     } catch (err: any) {
       console.error('Failed to add income:', err);
-      const message = err.response?.data?.message || err.message || 'Failed to add income';
+      const message = err.response?.data?.detail || err.response?.data?.message || err.message || 'Failed to add income';
       toast.error(message);
     }
   };
@@ -95,8 +98,11 @@ export default function PropertyDetail() {
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Try removing property_id from the body since it's in the URL
+      // Generate a random ID as the backend requires expense_id and doesn't auto-generate it
+      const randomId = Math.floor(Math.random() * 1000000);
       const expenseData = {
+        expense_id: randomId,
+        property_id: propertyId,
         amount: Number(newExpense.amount),
         date: newExpense.date,
         category: newExpense.category,
@@ -110,7 +116,7 @@ export default function PropertyDetail() {
       fetchData();
     } catch (err: any) {
       console.error('Failed to add expense:', err);
-      const message = err.response?.data?.message || err.message || 'Failed to add expense';
+      const message = err.response?.data?.detail || err.response?.data?.message || err.message || 'Failed to add expense';
       toast.error(message);
     }
   };
